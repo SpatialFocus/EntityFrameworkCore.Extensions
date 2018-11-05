@@ -1,6 +1,7 @@
 # SpatialFocus.EntityFrameworkCore.Extensions
 A set of useful extensions for EntityFrameworkCore (Enum Lookup Tables, Naming of tables / properties / keys, Pluralize).
 
+[![Build Status](https://spatial-focus.visualstudio.com/Internal/_apis/build/status/SpatialFocus.EntityFrameworkCore.Extensions-CI)](https://spatial-focus.visualstudio.com/Internal/_build/latest?definitionId=2)
 [![NuGet](https://img.shields.io/nuget/v/SpatialFocus.EntityFrameworkCore.Extensions.svg)](https://www.nuget.org/packages/SpatialFocus.EntityFrameworkCore.Extensions/)
 
 ## Installation
