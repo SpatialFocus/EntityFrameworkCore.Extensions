@@ -26,35 +26,35 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 		public static NamingOptions Default =>
 			new NamingOptions().SetTableNamingSource(NamingSource.DbSet).SetNamingScheme(NamingScheme.SnakeCase);
 
-		public Func<string, string> ConstraintNamingFunction
+		internal Func<string, string> ConstraintNamingFunction
 		{
 			get => this.constraintNamingFunction ?? NamingFunction;
 			set => this.constraintNamingFunction = value;
 		}
 
-		public Func<IMutableEntityType, bool> EntitiesToSkipEntirely
+		internal Func<IMutableEntityType, bool> EntitiesToSkipEntirely
 		{
 			get => this.entitiesToSkipEntirely ?? (type => false);
 			set => this.entitiesToSkipEntirely = value;
 		}
 
-		public Func<IMutableEntityType, bool> EntitiesToSkipTableNaming
+		internal Func<IMutableEntityType, bool> EntitiesToSkipTableNaming
 		{
 			get => this.entitiesToSkipTableNaming ?? (type => false);
 			set => this.entitiesToSkipTableNaming = value;
 		}
 
-		public Func<string, string> NamingFunction { get; set; }
+		internal Func<string, string> NamingFunction { get; set; }
 
-		public Func<string, string> PropertyNamingFunction
+		internal Func<string, string> PropertyNamingFunction
 		{
 			get => this.propertyNamingFunction ?? NamingFunction;
 			set => this.propertyNamingFunction = value;
 		}
 
-		public Func<IMutableEntityType, string> TableNameSource { get; set; }
+		internal Func<IMutableEntityType, string> TableNameSource { get; set; }
 
-		public Func<string, string> TableNamingFunction
+		internal Func<string, string> TableNamingFunction
 		{
 			get =>
 				name => this.postProcessingTableNamingFunction(this.tableNamingFunction != null

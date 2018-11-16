@@ -26,9 +26,9 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 			}
 		}
 
-		public Func<string, string> NamingFunction => name => this.postProcessingTableNamingFunction(this.namingFunction(name));
+		internal Func<string, string> NamingFunction => name => this.postProcessingTableNamingFunction(this.namingFunction(name));
 
-		public bool UseNumberLookup { get; private set; }
+		internal bool UseNumberLookup { get; private set; }
 
 		public EnumLookupOptions Pluralize()
 		{
