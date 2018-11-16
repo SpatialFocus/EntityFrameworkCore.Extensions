@@ -8,7 +8,7 @@ A set of useful extensions for EntityFrameworkCore (Enum Lookup Tables, Naming o
 ## Installation
 
 ```console
-Install-Package SpatialFocus.EntityFrameworkCore.Extensions -Version 1.0.0-rc2
+Install-Package SpatialFocus.EntityFrameworkCore.Extensions
 ```
 
 ## Usage
