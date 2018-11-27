@@ -43,6 +43,7 @@ The two extension methods in the `OnModelCreating` method in the `DbContext` cla
   - **UseNumberAsIdentifier()** or **UseStringAsIdentifier()** defines whether the lookup table will be based on the string enum values or the numeric enum value as primary key in the resulting table and as foreign key in the relation.
   - **Singularize()** or **Pluralize()** defines whether the table names will be the singular or plural versions of the enum type.
   - **SetNamingScheme(...)** allows you to override the naming using one of the predefined schemes (see below) or a custom function.
+  - **UseEnumsWithAttributeOnly()** to generate the enum lookup tables only for enums marked with the `[EnumLookup]` attribute
 
 - **ConfigureNames(...)** allows you to define in which form tables, properties and constraints will be named:
 
