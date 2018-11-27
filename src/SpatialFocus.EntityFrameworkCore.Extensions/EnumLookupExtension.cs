@@ -15,6 +15,8 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 	public static class EnumLookupExtension
 	{
+		private static List<Type> ConcreteTypeSeededList { get; set; } = new List<Type>();
+
 		// See https://github.com/aspnet/EntityFrameworkCore/issues/12248#issuecomment-395450990
 		public static void ConfigureEnumLookup(this ModelBuilder modelBuilder, EnumLookupOptions enumOptions)
 		{
@@ -43,8 +45,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 				string tableName = enumOptions.NamingFunction(typeName);
 				enumLookupBuilder.ToTable(tableName);
 
-				string keyName = enumOptions.UseNumberLookup
-					? nameof(EnumWithNumberLookup<Enum>.Id)
+				string keyName = enumOptions.UseNumberLookup ? nameof(EnumWithNumberLookup<Enum>.Id)
 					: nameof(EnumWithStringLookup<Enum>.Id);
 
 				modelBuilder.Entity(entityType.Name).HasOne(concreteType).WithMany().HasPrincipalKey(keyName).HasForeignKey(property.Name);
@@ -62,6 +63,13 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 					modelBuilder.Entity(entityType.Name).Property(property.Name).HasConversion(valueConverter);
 					modelBuilder.Entity(concreteType).Property(keyName).HasConversion(valueConverter);
 				}
+
+				if (ConcreteTypeSeededList.Contains(concreteType))
+				{
+					continue;
+				}
+
+				ConcreteTypeSeededList.Add(concreteType);
 
 				// TODO: Check status of https://github.com/aspnet/EntityFrameworkCore/issues/12194 before using migrations
 				object[] data = Enum.GetValues(propertyType.GetEnumOrNullableEnumType())
@@ -84,20 +92,9 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 					})
 					.ToArray();
 
-				if (!ConcreteTypeSeededList.Contains(concreteType))
-				{
-					ConcreteTypeSeededList.Add(concreteType);
-				}
-				else
-				{
-					continue;
-				}
-
 				enumLookupBuilder.HasData(data);
 			}
 		}
-
-		private static List<Type> ConcreteTypeSeededList { get; set; } = new List<Type>();
 
 		private static Type GetEnumOrNullableEnumType(this Type propertyType)
 		{
@@ -109,10 +106,8 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 			return propertyType.IsEnum ? propertyType : propertyType.GetGenericArguments()[0];
 		}
 
-
 		private static bool HasEnumWithAttribute(this Type propertyType)
 		{
-
 			if (propertyType.GetCustomAttributes(typeof(EnumLookupAttribute), true).Any())
 			{
 				return true;
