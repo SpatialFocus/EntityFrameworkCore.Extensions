@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.0.0</Version>
+		<Version>1.1.0</Version>
 		<PackageId>SpatialFocus.EntityFrameworkCore.Extensions</PackageId>
 		<Title>Spatial Focus EntityFrameworkCore Extensions</Title>
 		<Description>A set of useful extensions for EntityFrameworkCore (Enum Lookup Tables, Naming of tables / properties / keys, Pluralize).</Description>

@@ -21,12 +21,15 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 				EnumLookupOptions enumOptions = new EnumLookupOptions();
 				enumOptions.SetNamingScheme(NamingScheme.SnakeCase);
 				enumOptions.UseNumberLookup = true;
+				enumOptions.UseEnumsWithAttributesOnly = false;
 
 				return enumOptions;
 			}
 		}
 
 		internal Func<string, string> NamingFunction => name => this.postProcessingTableNamingFunction(this.namingFunction(name));
+
+		internal bool UseEnumsWithAttributesOnly { get; private set; }
 
 		internal bool UseNumberLookup { get; private set; }
 
@@ -47,6 +50,13 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 		public EnumLookupOptions Singularize()
 		{
 			this.postProcessingTableNamingFunction = name => name.Singularize(false);
+
+			return this;
+		}
+
+		public EnumLookupOptions UseEnumsWithAttributeOnly()
+		{
+			UseEnumsWithAttributesOnly = true;
 
 			return this;
 		}
