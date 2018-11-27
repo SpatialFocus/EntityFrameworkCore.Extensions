@@ -6,6 +6,7 @@
 namespace SpatialFocus.EntityFrameworkCore.Extensions
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Linq;
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.EntityFrameworkCore.Metadata;
@@ -82,9 +83,20 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 					})
 					.ToArray();
 
+				if (!ConcreteTypeSeededList.Contains(concreteType))
+				{
+					ConcreteTypeSeededList.Add(concreteType);
+				}
+				else
+				{
+					continue;
+				}
+
 				enumLookupBuilder.HasData(data);
 			}
 		}
+
+		private static List<Type> ConcreteTypeSeededList { get; set; } = new List<Type>();
 
 		private static Type GetEnumOrNullableEnumType(this Type propertyType)
 		{

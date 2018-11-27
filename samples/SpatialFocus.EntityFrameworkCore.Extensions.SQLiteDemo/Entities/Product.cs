@@ -24,6 +24,8 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo.Entities
 
 		public ProductCategory ProductCategory { get; set; }
 
+		public ProductCategory ProductCategorySecondField { get; set; }
+
 		public int ProductId { get; set; }
 
 		public DateTime ReleaseDate { get; set; }
