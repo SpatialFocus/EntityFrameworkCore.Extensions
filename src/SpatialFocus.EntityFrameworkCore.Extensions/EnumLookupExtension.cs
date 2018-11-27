@@ -6,6 +6,7 @@
 namespace SpatialFocus.EntityFrameworkCore.Extensions
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Linq;
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.EntityFrameworkCore.Metadata;
@@ -14,6 +15,8 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 	public static class EnumLookupExtension
 	{
+		private static List<Type> ConcreteTypeSeededList { get; set; } = new List<Type>();
+
 		// See https://github.com/aspnet/EntityFrameworkCore/issues/12248#issuecomment-395450990
 		public static void ConfigureEnumLookup(this ModelBuilder modelBuilder, EnumLookupOptions enumOptions)
 		{
@@ -26,7 +29,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 					continue;
 				}
 
-				if (enumOptions.UseEnumsWithAttributesOnly && !propertyType.GetCustomAttributes(typeof(EnumLookupAttribute), true).Any())
+				if (enumOptions.UseEnumsWithAttributesOnly && !propertyType.HasEnumWithAttribute())
 				{
 					continue;
 				}
@@ -61,6 +64,13 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 					modelBuilder.Entity(concreteType).Property(keyName).HasConversion(valueConverter);
 				}
 
+				if (ConcreteTypeSeededList.Contains(concreteType))
+				{
+					continue;
+				}
+
+				ConcreteTypeSeededList.Add(concreteType);
+
 				// TODO: Check status of https://github.com/aspnet/EntityFrameworkCore/issues/12194 before using migrations
 				object[] data = Enum.GetValues(propertyType.GetEnumOrNullableEnumType())
 					.OfType<object>()
@@ -94,6 +104,24 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 			}
 
 			return propertyType.IsEnum ? propertyType : propertyType.GetGenericArguments()[0];
+		}
+
+		private static bool HasEnumWithAttribute(this Type propertyType)
+		{
+			if (propertyType.GetCustomAttributes(typeof(EnumLookupAttribute), true).Any())
+			{
+				return true;
+			}
+
+			if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+			{
+				if (propertyType.GetGenericArguments()[0].GetCustomAttributes(typeof(EnumLookupAttribute), true).Any())
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private static bool IsEnumOrNullableEnumType(this Type propertyType)
