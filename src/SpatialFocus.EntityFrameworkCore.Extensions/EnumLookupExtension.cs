@@ -26,6 +26,11 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 					continue;
 				}
 
+				if (enumOptions.useEnumsWithAttirbutesOnly && !propertyType.GetCustomAttributes(true).Contains(new EnumLookupAttribute()))
+				{
+					continue;
+				}
+
 				IMutableEntityType entityType = property.DeclaringEntityType;
 
 				Type concreteType = enumOptions.UseNumberLookup
