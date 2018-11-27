@@ -31,7 +31,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 				// Properties
 				entity.GetProperties()
 					.ToList()
-					.ForEach(x => x.Relational().ColumnName = namingOptions.PropertyNamingFunction(x.Relational().ColumnName));
+					.ForEach(x => x.Relational().ColumnName = namingOptions.ColumnNamingFunction(x.Relational().ColumnName));
 
 				// Primary and Alternative keys
 				entity.GetKeys().ToList().ForEach(x => x.Relational().Name = namingOptions.ConstraintNamingFunction(x.Relational().Name));

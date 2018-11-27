@@ -19,7 +19,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 		private Func<string, string> postProcessingTableNamingFunction = name => name;
 
-		private Func<string, string> propertyNamingFunction;
+		private Func<string, string> columnNamingFunction;
 
 		private Func<string, string> tableNamingFunction;
 
@@ -46,10 +46,10 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 		internal Func<string, string> NamingFunction { get; set; }
 
-		internal Func<string, string> PropertyNamingFunction
+		internal Func<string, string> ColumnNamingFunction
 		{
-			get => this.propertyNamingFunction ?? NamingFunction;
-			set => this.propertyNamingFunction = value;
+			get => this.columnNamingFunction ?? NamingFunction;
+			set => this.columnNamingFunction = value;
 		}
 
 		internal Func<IMutableEntityType, string> TableNameSource { get; set; }
@@ -57,21 +57,20 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 		internal Func<string, string> TableNamingFunction
 		{
 			get =>
-				name => this.postProcessingTableNamingFunction(this.tableNamingFunction != null
-					? this.tableNamingFunction(name)
+				name => this.postProcessingTableNamingFunction(this.tableNamingFunction != null ? this.tableNamingFunction(name)
 					: NamingFunction(name));
 			set => this.tableNamingFunction = value;
+		}
+
+		public NamingOptions OverrideColumnNaming(Func<string, string> namingFunc)
+		{
+			ColumnNamingFunction = namingFunc;
+			return this;
 		}
 
 		public NamingOptions OverrideConstraintNaming(Func<string, string> namingFunc)
 		{
 			ConstraintNamingFunction = namingFunc;
-			return this;
-		}
-
-		public NamingOptions OverridePropertyNaming(Func<string, string> namingFunc)
-		{
-			PropertyNamingFunction = namingFunc;
 			return this;
 		}
 

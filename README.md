@@ -51,7 +51,7 @@ The two extension methods in the `OnModelCreating` method in the `DbContext` cla
   - **SetTableNamingSource(...)** defines which naming source to use (see below). It means whether to use the ClrType name or the DbSet name to name the tables.
   - **Singularize()** or **Pluralize()** defines whether the table names will be the singular or plural versions.
   - **SetNamingScheme(...)** allows you to override the naming using one of the predefined schemes (see below) or a custom function.
-  - **OverrideTableNaming(...)**, **OverridePropertyNaming(...)**, **OverrideConstraintNaming(...)** to deviate from the general naming scheme.
+  - **OverrideTableNaming(...)**, **OverrideColumnNaming(...)**, **OverrideConstraintNaming(...)** to deviate from the general naming scheme.
   - **SkipEntireEntities(...)** and **SkipTableNamingForEntities(...)** to skip the naming for either the whole entity or just the table name for certain entities by using a `Func<IMutableEntityType, bool>` skip function, e.g. `SkipEntireEntities(entity => entity.Name == "MyEntity")`.
   - **SkipTableNamingForGenericEntityTypes()** should be used to avoid naming the Enum lookup tables which can lead to unwanted results.
 
