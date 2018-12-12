@@ -7,7 +7,9 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 {
 	using System;
 	using System.Collections.Generic;
+	using System.ComponentModel;
 	using System.Linq;
+	using System.Reflection;
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.EntityFrameworkCore.Metadata;
 	using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -36,9 +38,26 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 				IMutableEntityType entityType = property.DeclaringEntityType;
 
-				Type concreteType = enumOptions.UseNumberLookup
-					? typeof(EnumWithNumberLookup<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType())
-					: typeof(EnumWithStringLookup<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType());
+				Dictionary<int, string> enumValueDescriptions = Enum.GetValues(propertyType.GetEnumOrNullableEnumType())
+					.Cast<Enum>()
+					.ToDictionary(Convert.ToInt32, GetEnumDescription);
+
+				bool usesDescription = enumValueDescriptions.Values.Any(x => x != null);
+
+				Type concreteType;
+				if (usesDescription)
+				{
+					concreteType = enumOptions.UseNumberLookup
+						? typeof(EnumWithNumberLookupAndDescription<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType())
+						: typeof(EnumWithStringLookupAndDescription<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType());
+				}
+				else
+				{
+					concreteType = enumOptions.UseNumberLookup
+						? typeof(EnumWithNumberLookup<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType())
+						: typeof(EnumWithStringLookup<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType());
+				}
+
 				EntityTypeBuilder enumLookupBuilder = modelBuilder.Entity(concreteType);
 
 				string typeName = propertyType.GetEnumOrNullableEnumType().Name;
@@ -54,8 +73,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 				{
 					modelBuilder.Entity(concreteType).HasIndex(nameof(EnumWithNumberLookup<Enum>.Name)).IsUnique();
 				}
-
-				if (!enumOptions.UseNumberLookup)
+				else
 				{
 					Type converterType = typeof(EnumToStringConverter<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType());
 					ValueConverter valueConverter = (ValueConverter)Activator.CreateInstance(converterType, new object[] { null });
@@ -82,10 +100,22 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 						{
 							concreteType.GetProperty(nameof(EnumWithNumberLookup<object>.Id)).SetValue(instance, x);
 							concreteType.GetProperty(nameof(EnumWithNumberLookup<object>.Name)).SetValue(instance, x.ToString());
+
+							if (usesDescription)
+							{
+								concreteType.GetProperty(nameof(EnumWithNumberLookupAndDescription<object>.Description))
+									.SetValue(instance, enumValueDescriptions[(int)x]);
+							}
 						}
 						else
 						{
 							concreteType.GetProperty(nameof(EnumWithStringLookup<object>.Id)).SetValue(instance, x);
+
+							if (usesDescription)
+							{
+								concreteType.GetProperty(nameof(EnumWithNumberLookupAndDescription<object>.Description))
+									.SetValue(instance, enumValueDescriptions[(int)x]);
+							}
 						}
 
 						return instance;
@@ -94,6 +124,15 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 				enumLookupBuilder.HasData(data);
 			}
+		}
+
+		public static string GetEnumDescription(Enum value)
+		{
+			FieldInfo fieldInfo = value.GetType().GetField(value.ToString());
+
+			DescriptionAttribute attribute = (DescriptionAttribute)fieldInfo.GetCustomAttribute(typeof(DescriptionAttribute), true);
+
+			return attribute?.Description;
 		}
 
 		private static Type GetEnumOrNullableEnumType(this Type propertyType)
