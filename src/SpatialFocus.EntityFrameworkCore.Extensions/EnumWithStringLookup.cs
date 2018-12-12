@@ -18,6 +18,8 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 			Id = value;
 		}
 
+		public string Description { get; set; }
+
 		[DatabaseGenerated(DatabaseGeneratedOption.None)]
 		public T Id { get; set; }
 	}

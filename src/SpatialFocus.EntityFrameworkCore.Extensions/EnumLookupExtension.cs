@@ -7,7 +7,9 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 {
 	using System;
 	using System.Collections.Generic;
+	using System.ComponentModel;
 	using System.Linq;
+	using System.Reflection;
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.EntityFrameworkCore.Metadata;
 	using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -71,6 +73,10 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 				ConcreteTypeSeededList.Add(concreteType);
 
+				Dictionary<int, string> enumValueDescriptions = Enum.GetValues(propertyType.GetEnumOrNullableEnumType())
+					.Cast<Enum>()
+					.ToDictionary(Convert.ToInt32, GetEnumDescription);
+
 				// TODO: Check status of https://github.com/aspnet/EntityFrameworkCore/issues/12194 before using migrations
 				object[] data = Enum.GetValues(propertyType.GetEnumOrNullableEnumType())
 					.OfType<object>()
@@ -82,10 +88,14 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 						{
 							concreteType.GetProperty(nameof(EnumWithNumberLookup<object>.Id)).SetValue(instance, x);
 							concreteType.GetProperty(nameof(EnumWithNumberLookup<object>.Name)).SetValue(instance, x.ToString());
+							concreteType.GetProperty(nameof(EnumWithNumberLookup<object>.Description))
+								.SetValue(instance, enumValueDescriptions[(int)x]);
 						}
 						else
 						{
 							concreteType.GetProperty(nameof(EnumWithStringLookup<object>.Id)).SetValue(instance, x);
+							concreteType.GetProperty(nameof(EnumWithNumberLookup<object>.Description))
+								.SetValue(instance, enumValueDescriptions[(int)x]);
 						}
 
 						return instance;
@@ -94,6 +104,15 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 				enumLookupBuilder.HasData(data);
 			}
+		}
+
+		public static string GetEnumDescription(Enum value)
+		{
+			FieldInfo fi = value.GetType().GetField(value.ToString());
+
+			DescriptionAttribute attribute = (DescriptionAttribute)fi.GetCustomAttribute(typeof(DescriptionAttribute), true);
+
+			return attribute?.Description;
 		}
 
 		private static Type GetEnumOrNullableEnumType(this Type propertyType)
