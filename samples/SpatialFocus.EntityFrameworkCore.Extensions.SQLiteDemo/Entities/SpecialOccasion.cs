@@ -22,6 +22,6 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo.Entities
 		Valentines,
 
 		[Description("Marriage anniversary")]
-		Wedding,
+		WeddingDay,
 	}
 }
