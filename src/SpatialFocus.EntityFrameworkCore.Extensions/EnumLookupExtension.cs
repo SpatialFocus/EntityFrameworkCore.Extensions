@@ -29,7 +29,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 					continue;
 				}
 
-				if (enumOptions.UseEnumsWithAttributesOnly && !propertyType.HasEnumWithAttribute())
+				if (enumOptions.UseEnumsWithAttributesOnly && !propertyType.HasEnumLookupAttribute())
 				{
 					continue;
 				}
@@ -106,7 +106,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 			return propertyType.IsEnum ? propertyType : propertyType.GetGenericArguments()[0];
 		}
 
-		private static bool HasEnumWithAttribute(this Type propertyType)
+		private static bool HasEnumLookupAttribute(this Type propertyType)
 		{
 			if (propertyType.GetCustomAttributes(typeof(EnumLookupAttribute), true).Any())
 			{
