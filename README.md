@@ -44,6 +44,7 @@ The two extension methods in the `OnModelCreating` method in the `DbContext` cla
   - **Singularize()** or **Pluralize()** defines whether the table names will be the singular or plural versions of the enum type.
   - **SetNamingScheme(...)** allows you to override the naming using one of the predefined schemes (see below) or a custom function.
   - **UseEnumsWithAttributeOnly()** to generate the enum lookup tables only for enums marked with the `[EnumLookup]` attribute
+  - **SetDeleteBehavior(...)** to configure the delete behavior for the generated FKs, using the `Microsoft.EntityFrameworkCore.DeleteBehavior` enum (defaults to _Cascade_)
 
 - **ConfigureNames(...)** allows you to define in which form tables, properties and constraints will be named:
 
