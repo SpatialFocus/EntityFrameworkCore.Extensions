@@ -31,15 +31,22 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 		internal Func<string, string> NamingFunction => name => this.postProcessingTableNamingFunction(this.namingFunction(name));
 
+		internal DeleteBehavior DeleteBehavior { get; private set; }
+
 		internal bool UseEnumsWithAttributesOnly { get; private set; }
 
 		internal bool UseNumberLookup { get; private set; }
 
-		internal DeleteBehavior DeleteBehavior { get; private set; }
-
 		public EnumLookupOptions Pluralize()
 		{
 			this.postProcessingTableNamingFunction = name => name.Pluralize(false);
+
+			return this;
+		}
+
+		public EnumLookupOptions SetDeleteBehavior(DeleteBehavior deleteBehavior)
+		{
+			DeleteBehavior = deleteBehavior;
 
 			return this;
 		}
@@ -75,13 +82,6 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 		public EnumLookupOptions UseStringAsIdentifier()
 		{
 			UseNumberLookup = false;
-
-			return this;
-		}
-
-		public EnumLookupOptions SetDeleteBehavior(DeleteBehavior deleteBehavior)
-		{
-			DeleteBehavior = deleteBehavior;
 
 			return this;
 		}
