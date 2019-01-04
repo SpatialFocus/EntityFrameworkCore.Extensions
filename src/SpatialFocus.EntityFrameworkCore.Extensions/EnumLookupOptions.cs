@@ -7,6 +7,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 {
 	using System;
 	using Humanizer;
+	using Microsoft.EntityFrameworkCore;
 
 	public class EnumLookupOptions
 	{
@@ -22,12 +23,15 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 				enumOptions.SetNamingScheme(NamingScheme.SnakeCase);
 				enumOptions.UseNumberLookup = true;
 				enumOptions.UseEnumsWithAttributesOnly = false;
+				enumOptions.DeleteBehavior = DeleteBehavior.Cascade;
 
 				return enumOptions;
 			}
 		}
 
 		internal Func<string, string> NamingFunction => name => this.postProcessingTableNamingFunction(this.namingFunction(name));
+
+		internal DeleteBehavior DeleteBehavior { get; private set; }
 
 		internal bool UseEnumsWithAttributesOnly { get; private set; }
 
@@ -36,6 +40,13 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 		public EnumLookupOptions Pluralize()
 		{
 			this.postProcessingTableNamingFunction = name => name.Pluralize(false);
+
+			return this;
+		}
+
+		public EnumLookupOptions SetDeleteBehavior(DeleteBehavior deleteBehavior)
+		{
+			DeleteBehavior = deleteBehavior;
 
 			return this;
 		}

@@ -64,10 +64,16 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 				string tableName = enumOptions.NamingFunction(typeName);
 				enumLookupBuilder.ToTable(tableName);
 
-				string keyName = enumOptions.UseNumberLookup ? nameof(EnumWithNumberLookup<Enum>.Id)
+				string keyName = enumOptions.UseNumberLookup
+					? nameof(EnumWithNumberLookup<Enum>.Id)
 					: nameof(EnumWithStringLookup<Enum>.Id);
 
-				modelBuilder.Entity(entityType.Name).HasOne(concreteType).WithMany().HasPrincipalKey(keyName).HasForeignKey(property.Name);
+				modelBuilder.Entity(entityType.Name)
+					.HasOne(concreteType)
+					.WithMany()
+					.HasPrincipalKey(keyName)
+					.HasForeignKey(property.Name)
+					.OnDelete(enumOptions.DeleteBehavior);
 
 				if (enumOptions.UseNumberLookup)
 				{
