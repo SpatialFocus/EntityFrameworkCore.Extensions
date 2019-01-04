@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.2.0</Version>
+		<Version>1.3.0</Version>
 		<PackageId>SpatialFocus.EntityFrameworkCore.Extensions</PackageId>
 		<Title>Spatial Focus EntityFrameworkCore Extensions</Title>
 		<Description>A set of useful extensions for EntityFrameworkCore (Enum Lookup Tables, Naming of tables / properties / keys, Pluralize).</Description>
@@ -18,13 +18,13 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Humanizer.Core" Version="2.5.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.4" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Humanizer.Core" Version="2.5.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.4" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.4" />
+	</ItemGroup>
 
 </Project>
