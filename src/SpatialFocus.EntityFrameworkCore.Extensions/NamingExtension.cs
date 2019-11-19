@@ -25,26 +25,26 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 				{
 					string tableName = namingOptions.TableNameSource(entity);
 
-					entity.Relational().TableName = namingOptions.TableNamingFunction(tableName);
+					entity.SetTableName(namingOptions.TableNamingFunction(tableName));
 				}
 
 				// Properties
 				entity.GetProperties()
 					.ToList()
-					.ForEach(x => x.Relational().ColumnName = namingOptions.ColumnNamingFunction(x.Relational().ColumnName));
+					.ForEach(x => x.SetColumnName(namingOptions.ColumnNamingFunction(x.GetColumnName())));
 
 				// Primary and Alternative keys
-				entity.GetKeys().ToList().ForEach(x => x.Relational().Name = namingOptions.ConstraintNamingFunction(x.Relational().Name));
+				entity.GetKeys().ToList().ForEach(x => x.SetName(namingOptions.ConstraintNamingFunction(x.GetName())));
 
 				// Foreign keys
 				entity.GetForeignKeys()
 					.ToList()
-					.ForEach(x => x.Relational().Name = namingOptions.ConstraintNamingFunction(x.Relational().Name));
+					.ForEach(x => x.SetConstraintName(namingOptions.ConstraintNamingFunction(x.GetConstraintName())));
 
 				// Indices
 				entity.GetIndexes()
 					.ToList()
-					.ForEach(x => x.Relational().Name = namingOptions.ConstraintNamingFunction(x.Relational().Name));
+					.ForEach(x => x.SetName(namingOptions.ConstraintNamingFunction(x.GetName())));
 			}
 		}
 	}

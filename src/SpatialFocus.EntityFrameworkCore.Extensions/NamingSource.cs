@@ -13,6 +13,6 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 	{
 		public static Func<IMutableEntityType, string> ClrType => entity => entity.ClrType.Name;
 
-		public static Func<IMutableEntityType, string> DbSet => entity => entity.Relational().TableName;
+		public static Func<IMutableEntityType, string> DbSet => entity => entity.GetTableName();
 	}
 }

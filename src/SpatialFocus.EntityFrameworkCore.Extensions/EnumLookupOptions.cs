@@ -11,7 +11,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 	public class EnumLookupOptions
 	{
-		private Func<string, string> namingFunction;
+		private Func<string, string> namingFunction = name => name;
 
 		private Func<string, string> postProcessingTableNamingFunction = name => name;
 
@@ -40,49 +40,42 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 		public EnumLookupOptions Pluralize()
 		{
 			this.postProcessingTableNamingFunction = name => name.Pluralize(false);
-
 			return this;
 		}
 
 		public EnumLookupOptions SetDeleteBehavior(DeleteBehavior deleteBehavior)
 		{
 			DeleteBehavior = deleteBehavior;
-
 			return this;
 		}
 
 		public EnumLookupOptions SetNamingScheme(Func<string, string> namingFunc)
 		{
 			this.namingFunction = namingFunc;
-
 			return this;
 		}
 
 		public EnumLookupOptions Singularize()
 		{
 			this.postProcessingTableNamingFunction = name => name.Singularize(false);
-
 			return this;
 		}
 
 		public EnumLookupOptions UseEnumsWithAttributeOnly()
 		{
 			UseEnumsWithAttributesOnly = true;
-
 			return this;
 		}
 
 		public EnumLookupOptions UseNumberAsIdentifier()
 		{
 			UseNumberLookup = true;
-
 			return this;
 		}
 
 		public EnumLookupOptions UseStringAsIdentifier()
 		{
 			UseNumberLookup = false;
-
 			return this;
 		}
 	}
