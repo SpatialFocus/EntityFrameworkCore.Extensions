@@ -1,15 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2042
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpatialFocus.EntityFrameworkCore.Extensions", "src\SpatialFocus.EntityFrameworkCore.Extensions\SpatialFocus.EntityFrameworkCore.Extensions.csproj", "{768CB889-C6A3-475B-B8EE-72CE676DD5B8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpatialFocus.EntityFrameworkCore.Extensions.Demo", "samples\SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo\SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo.csproj", "{28AC20A6-FE86-427F-80D9-19D5D02D31FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo", "samples\SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo\SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo.csproj", "{28AC20A6-FE86-427F-80D9-19D5D02D31FB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{70FF5B08-F25B-44BE-B8FE-1F1884B5B3F0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{8092090A-24E1-45E6-84B3-AA060CC34619}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2C1E7909-3D0A-462C-AEE1-21D583FBCFD2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{AA695DE3-C613-4023-97F5-BF3841C5E233}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		LICENSE = LICENSE
+		README.md = README.md
+		SpatialFocus.EntityFrameworkCore.Extensions.ruleset = SpatialFocus.EntityFrameworkCore.Extensions.ruleset
+		SpatialFocus.EntityFrameworkCore.Extensions.sln.DotSettings = SpatialFocus.EntityFrameworkCore.Extensions.sln.DotSettings
+		stylecop.json = stylecop.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpatialFocus.EntityFrameworkCore.Extensions.Test", "test\SpatialFocus.EntityFrameworkCore.Extensions.Test\SpatialFocus.EntityFrameworkCore.Extensions.Test.csproj", "{F40647CD-65D8-4FD0-8391-88F7CD8D976D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +43,10 @@ Global
 		{28AC20A6-FE86-427F-80D9-19D5D02D31FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28AC20A6-FE86-427F-80D9-19D5D02D31FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28AC20A6-FE86-427F-80D9-19D5D02D31FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F40647CD-65D8-4FD0-8391-88F7CD8D976D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F40647CD-65D8-4FD0-8391-88F7CD8D976D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F40647CD-65D8-4FD0-8391-88F7CD8D976D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F40647CD-65D8-4FD0-8391-88F7CD8D976D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +54,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{768CB889-C6A3-475B-B8EE-72CE676DD5B8} = {70FF5B08-F25B-44BE-B8FE-1F1884B5B3F0}
 		{28AC20A6-FE86-427F-80D9-19D5D02D31FB} = {8092090A-24E1-45E6-84B3-AA060CC34619}
+		{F40647CD-65D8-4FD0-8391-88F7CD8D976D} = {2C1E7909-3D0A-462C-AEE1-21D583FBCFD2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D07B300-5F54-4D11-BA2E-668BF1671D72}
