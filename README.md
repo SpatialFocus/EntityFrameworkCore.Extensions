@@ -73,10 +73,10 @@ The two extension methods in the `OnModelCreating` method in the `DbContext` cla
 
 For an exemplary usage, see the `DemoContext` in the [sample project](https://github.com/SpatialFocus/SpatialFocus.EntityFrameworkCore.Extensions/tree/master/samples/SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo).
 
+## License
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSpatialFocus%2FEntityFrameworkCore.Extensions.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSpatialFocus%2FEntityFrameworkCore.Extensions?ref=badge_large)
+
 ----
 
 Made with :heart: by [Spatial Focus](https://spatial-focus.net/)
-
-
-## License
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSpatialFocus%2FEntityFrameworkCore.Extensions.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSpatialFocus%2FEntityFrameworkCore.Extensions?ref=badge_large)
