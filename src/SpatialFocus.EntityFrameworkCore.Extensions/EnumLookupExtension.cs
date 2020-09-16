@@ -76,7 +76,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 		{
 			Type propertyType = property.ClrType;
 
-			if (!IsValid(propertyType, enumOptions))
+			if (ShouldSkip(propertyType, enumOptions))
 			{
 				return;
 			}
@@ -232,19 +232,19 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 			return false;
 		}
 
-		private static bool IsValid(Type propertyType, EnumLookupOptions enumOptions)
+		private static bool ShouldSkip(Type propertyType, EnumLookupOptions enumOptions)
 		{
 			if (!propertyType.IsEnumOrNullableEnumType())
 			{
-				return false;
+				return true;
 			}
 
 			if (enumOptions.UseEnumsWithAttributesOnly && !propertyType.HasEnumLookupAttribute())
 			{
-				return false;
+				return true;
 			}
 
-			return true;
+			return false;
 		}
 	}
 }
