@@ -6,6 +6,7 @@
 namespace SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo.Entities
 {
 	using System;
+	using System.Collections.Generic;
 
 	public class Product
 	{
@@ -27,5 +28,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo.Entities
 		public int ProductId { get; set; }
 
 		public DateTime ReleaseDate { get; set; }
+
+		public List<Review> Reviews { get; set; }
 	}
 }

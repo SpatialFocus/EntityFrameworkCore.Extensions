@@ -19,116 +19,45 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 	{
 		private static List<Type> ConcreteTypeSeededList { get; set; } = new List<Type>();
 
-		// See https://github.com/aspnet/EntityFrameworkCore/issues/12248#issuecomment-395450990
 		public static void ConfigureEnumLookup(this ModelBuilder modelBuilder, EnumLookupOptions enumOptions)
 		{
 			foreach (IMutableProperty property in modelBuilder.Model.GetEntityTypes().SelectMany(x => x.GetProperties()).ToList())
 			{
-				Type propertyType = property.ClrType;
-
-				if (!propertyType.IsEnumOrNullableEnumType())
-				{
-					continue;
-				}
-
-				if (enumOptions.UseEnumsWithAttributesOnly && !propertyType.HasEnumLookupAttribute())
-				{
-					continue;
-				}
-
 				IMutableEntityType entityType = property.DeclaringEntityType;
 
-				Dictionary<int, string> enumValueDescriptions = Enum.GetValues(propertyType.GetEnumOrNullableEnumType())
-					.Cast<Enum>()
-					.ToDictionary(Convert.ToInt32, GetEnumDescription);
-
-				bool usesDescription = enumValueDescriptions.Values.Any(x => x != null);
-
-				Type concreteType;
-				if (usesDescription)
-				{
-					concreteType = enumOptions.UseNumberLookup
-						? typeof(EnumWithNumberLookupAndDescription<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType())
-						: typeof(EnumWithStringLookupAndDescription<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType());
-				}
-				else
-				{
-					concreteType = enumOptions.UseNumberLookup
-						? typeof(EnumWithNumberLookup<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType())
-						: typeof(EnumWithStringLookup<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType());
-				}
-
-				EntityTypeBuilder enumLookupBuilder = modelBuilder.Entity(concreteType);
-
-				string typeName = propertyType.GetEnumOrNullableEnumType().Name;
-				string tableName = enumOptions.NamingFunction(typeName);
-				enumLookupBuilder.ToTable(tableName);
-
-				string keyName = enumOptions.UseNumberLookup
-					? nameof(EnumWithNumberLookup<Enum>.Id)
-					: nameof(EnumWithStringLookup<Enum>.Id);
-
-				modelBuilder.Entity(entityType.Name)
-					.HasOne(concreteType)
-					.WithMany()
-					.HasPrincipalKey(keyName)
-					.HasForeignKey(property.Name)
-					.OnDelete(enumOptions.DeleteBehavior);
-
-				if (enumOptions.UseNumberLookup)
-				{
-					modelBuilder.Entity(concreteType).HasIndex(nameof(EnumWithNumberLookup<Enum>.Name)).IsUnique();
-				}
-				else
-				{
-					Type converterType = typeof(EnumToStringConverter<>).MakeGenericType(propertyType.GetEnumOrNullableEnumType());
-					ValueConverter valueConverter = (ValueConverter)Activator.CreateInstance(converterType, new object[] { null });
-
-					modelBuilder.Entity(entityType.Name).Property(property.Name).HasConversion(valueConverter);
-					modelBuilder.Entity(concreteType).Property(keyName).HasConversion(valueConverter);
-				}
-
-				if (ConcreteTypeSeededList.Contains(concreteType))
+				if (entityType.IsOwned())
 				{
 					continue;
 				}
 
-				ConcreteTypeSeededList.Add(concreteType);
-
-				// TODO: Check status of https://github.com/aspnet/EntityFrameworkCore/issues/12194 before using migrations
-				object[] data = Enum.GetValues(propertyType.GetEnumOrNullableEnumType())
-					.OfType<object>()
-					.Select(x =>
+				ConfigureEnumLookupForProperty(modelBuilder, enumOptions, property,
+					(enumLookupEntityType) =>
 					{
-						object instance = Activator.CreateInstance(concreteType);
+						modelBuilder.Entity(entityType.Name)
+							.HasOne(enumLookupEntityType)
+							.WithMany()
+							.HasPrincipalKey("Id")
+							.HasForeignKey(property.Name)
+							.OnDelete(enumOptions.DeleteBehavior);
+					}, (valueConverter) => { modelBuilder.Entity(entityType.Name).Property(property.Name).HasConversion(valueConverter); });
+			}
+		}
 
-						if (enumOptions.UseNumberLookup)
-						{
-							concreteType.GetProperty(nameof(EnumWithNumberLookup<object>.Id)).SetValue(instance, x);
-							concreteType.GetProperty(nameof(EnumWithNumberLookup<object>.Name)).SetValue(instance, x.ToString());
-
-							if (usesDescription)
-							{
-								concreteType.GetProperty(nameof(EnumWithNumberLookupAndDescription<object>.Description))
-									.SetValue(instance, enumValueDescriptions[(int)x]);
-							}
-						}
-						else
-						{
-							concreteType.GetProperty(nameof(EnumWithStringLookup<object>.Id)).SetValue(instance, x);
-
-							if (usesDescription)
-							{
-								concreteType.GetProperty(nameof(EnumWithNumberLookupAndDescription<object>.Description))
-									.SetValue(instance, enumValueDescriptions[(int)x]);
-							}
-						}
-
-						return instance;
-					})
-					.ToArray();
-
-				enumLookupBuilder.HasData(data);
+		public static void ConfigureOwnedEnumLookup<TEntity, TDependentEntity>(
+			this OwnedNavigationBuilder<TEntity, TDependentEntity> ownedNavigationBuilder, EnumLookupOptions enumOptions,
+			ModelBuilder modelBuilder) where TEntity : class where TDependentEntity : class
+		{
+			foreach (IMutableProperty property in ownedNavigationBuilder.OwnedEntityType.GetProperties().ToList())
+			{
+				ConfigureEnumLookupForProperty(modelBuilder, enumOptions, property,
+					(enumLookupEntityType) =>
+					{
+						ownedNavigationBuilder.HasOne(enumLookupEntityType)
+							.WithMany()
+							.HasPrincipalKey("Id")
+							.HasForeignKey(property.Name)
+							.OnDelete(enumOptions.DeleteBehavior);
+					}, (valueConverter) => { ownedNavigationBuilder.Property(property.Name).HasConversion(valueConverter); });
 			}
 		}
 
@@ -141,6 +70,110 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 			return attribute?.Description;
 		}
 
+		// See https://github.com/aspnet/EntityFrameworkCore/issues/12248#issuecomment-395450990
+		private static void ConfigureEnumLookupForProperty(ModelBuilder modelBuilder, EnumLookupOptions enumOptions,
+			IMutableProperty property, Action<Type> configureEntityType, Action<ValueConverter> configureEntityTypeConversion)
+		{
+			Type propertyType = property.ClrType;
+
+			if (!IsValid(propertyType, enumOptions))
+			{
+				return;
+			}
+
+			Type enumType = propertyType.GetEnumOrNullableEnumType();
+
+			Dictionary<int, string> enumValueDescriptions = GetEnumValueDescriptions(enumType);
+
+			bool usesDescription = enumValueDescriptions.Values.Any(x => x != null);
+
+			Type enumLookupEntityType = GetEnumLookupEntityType(enumOptions, usesDescription, enumType);
+
+			configureEntityType(enumLookupEntityType);
+
+			ValueConverter valueConverter = GetValueConverter(enumType);
+
+			if (!enumOptions.UseNumberLookup)
+			{
+				configureEntityTypeConversion(valueConverter);
+			}
+
+			if (ConcreteTypeSeededList.Contains(enumLookupEntityType))
+			{
+				return;
+			}
+
+			ConcreteTypeSeededList.Add(enumLookupEntityType);
+
+			EntityTypeBuilder enumLookupBuilder = modelBuilder.Entity(enumLookupEntityType);
+			ConfigureEnumLookupTable(enumLookupBuilder, enumOptions, enumType);
+
+			if (enumOptions.UseNumberLookup)
+			{
+				modelBuilder.Entity(enumLookupEntityType).HasIndex("Name").IsUnique();
+			}
+			else
+			{
+				modelBuilder.Entity(enumLookupEntityType).Property("Id").HasConversion(valueConverter);
+			}
+
+			// TODO: Check status of https://github.com/aspnet/EntityFrameworkCore/issues/12194 before using migrations
+			enumLookupBuilder.HasData(GetEnumData(enumType, enumLookupEntityType, enumOptions.UseNumberLookup, usesDescription,
+				enumValueDescriptions));
+		}
+
+		private static void ConfigureEnumLookupTable(EntityTypeBuilder enumLookupBuilder, EnumLookupOptions enumOptions, Type enumType)
+		{
+			string typeName = enumType.Name;
+			string tableName = enumOptions.NamingFunction(typeName);
+			enumLookupBuilder.ToTable(tableName);
+		}
+
+		private static object[] GetEnumData(Type enumType, Type concreteType, bool useNumberLookup, bool usesDescription,
+			Dictionary<int, string> enumValueDescriptions)
+		{
+			return Enum.GetValues(enumType)
+				.OfType<object>()
+				.Select(x =>
+				{
+					object instance = Activator.CreateInstance(concreteType);
+
+					concreteType.GetProperty("Id").SetValue(instance, x);
+
+					if (useNumberLookup)
+					{
+						concreteType.GetProperty("Name").SetValue(instance, x.ToString());
+					}
+
+					if (usesDescription)
+					{
+						concreteType.GetProperty("Description").SetValue(instance, enumValueDescriptions[(int)x]);
+					}
+
+					return instance;
+				})
+				.ToArray();
+		}
+
+		private static Type GetEnumLookupEntityType(EnumLookupOptions enumOptions, bool usesDescription, Type enumType)
+		{
+			Type concreteType;
+			if (usesDescription)
+			{
+				concreteType = enumOptions.UseNumberLookup
+					? typeof(EnumWithNumberLookupAndDescription<>).MakeGenericType(enumType)
+					: typeof(EnumWithStringLookupAndDescription<>).MakeGenericType(enumType);
+			}
+			else
+			{
+				concreteType = enumOptions.UseNumberLookup
+					? typeof(EnumWithNumberLookup<>).MakeGenericType(enumType)
+					: typeof(EnumWithStringLookup<>).MakeGenericType(enumType);
+			}
+
+			return concreteType;
+		}
+
 		private static Type GetEnumOrNullableEnumType(this Type propertyType)
 		{
 			if (!propertyType.IsEnumOrNullableEnumType())
@@ -149,6 +182,18 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 			}
 
 			return propertyType.IsEnum ? propertyType : propertyType.GetGenericArguments()[0];
+		}
+
+		private static Dictionary<int, string> GetEnumValueDescriptions(Type enumType)
+		{
+			return Enum.GetValues(enumType).Cast<Enum>().ToDictionary(Convert.ToInt32, GetEnumDescription);
+		}
+
+		private static ValueConverter GetValueConverter(Type enumType)
+		{
+			Type converterType = typeof(EnumToStringConverter<>).MakeGenericType(enumType);
+			ValueConverter valueConverter = (ValueConverter)Activator.CreateInstance(converterType, new object[] { null });
+			return valueConverter;
 		}
 
 		private static bool HasEnumLookupAttribute(this Type propertyType)
@@ -185,6 +230,21 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 			}
 
 			return false;
+		}
+
+		private static bool IsValid(Type propertyType, EnumLookupOptions enumOptions)
+		{
+			if (!propertyType.IsEnumOrNullableEnumType())
+			{
+				return false;
+			}
+
+			if (enumOptions.UseEnumsWithAttributesOnly && !propertyType.HasEnumLookupAttribute())
+			{
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

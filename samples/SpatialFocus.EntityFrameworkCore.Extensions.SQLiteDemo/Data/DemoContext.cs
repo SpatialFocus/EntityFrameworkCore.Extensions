@@ -38,6 +38,14 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo.Data
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			// Any custom model configuration should come before calling ConfigureEnumLookup and ConfigureNames
+			modelBuilder.Entity<Product>()
+				.OwnsMany<Review>(nameof(Product.Reviews),
+					builder =>
+					{
+						builder.ConfigureOwnedEnumLookup(EnumLookupOptions.Default.Pluralize().UseStringAsIdentifier(), modelBuilder);
+					});
+
 			modelBuilder.ConfigureEnumLookup(EnumLookupOptions.Default.Pluralize().UseStringAsIdentifier());
 
 			modelBuilder.ConfigureNames(NamingOptions.Default.Pluralize()
@@ -47,29 +55,32 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.SQLiteDemo.Data
 				.SkipTableNamingForGenericEntityTypes());
 
 			modelBuilder.Entity<Product>()
-				.HasData(new Product
-				{
-					ProductId = 1,
-					ProductCategory = ProductCategory.Book,
-					Name = "Robinson Crusoe",
-					ReleaseDate = new DateTime(1719, 4, 25),
-					Price = 14.99,
-				}, new Product
-				{
-					ProductId = 2,
-					ProductCategory = ProductCategory.Bluray,
-					Name = "Rogue One: A Star Wars Story",
-					ReleaseDate = new DateTime(2017, 5, 4),
-					Price = 11.99,
-				}, new Product
-				{
-					ProductId = 3,
-					ProductCategory = ProductCategory.CD,
-					Name = "Wham! - Last Christmas",
-					ReleaseDate = new DateTime(1984, 12, 3),
-					Price = 6.97,
-					IdealForSpecialOccasion = SpecialOccasion.Christmas,
-				});
+				.HasData(
+					new Product
+					{
+						ProductId = 1,
+						ProductCategory = ProductCategory.Book,
+						Name = "Robinson Crusoe",
+						ReleaseDate = new DateTime(1719, 4, 25),
+						Price = 14.99,
+					},
+					new Product
+					{
+						ProductId = 2,
+						ProductCategory = ProductCategory.Bluray,
+						Name = "Rogue One: A Star Wars Story",
+						ReleaseDate = new DateTime(2017, 5, 4),
+						Price = 11.99,
+					},
+					new Product
+					{
+						ProductId = 3,
+						ProductCategory = ProductCategory.CD,
+						Name = "Wham! - Last Christmas",
+						ReleaseDate = new DateTime(1984, 12, 3),
+						Price = 6.97,
+						IdealForSpecialOccasion = SpecialOccasion.Christmas,
+					});
 		}
 	}
 }

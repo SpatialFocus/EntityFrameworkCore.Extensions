@@ -25,10 +25,14 @@ public partial class MyContext : DbContext
 
    protected override void OnModelCreating(ModelBuilder modelBuilder)
    {
+      // Any custom model configuration should come before calling ConfigureEnumLookup and ConfigureNames
+      // ...
+
       modelBuilder.ConfigureEnumLookup(EnumLookupOptions.Default.UseStringAsIdentifier());
 
       modelBuilder.ConfigureNames(NamingOptions.Default.SkipTableNamingForGenericEntityTypes());
 
+      // Any configuration after calling the two methods will not be processed by this Extension
       // ...
    }
 }
@@ -36,7 +40,7 @@ public partial class MyContext : DbContext
 
 ## Configuration Options
 
-The two extension methods in the `OnModelCreating` method in the `DbContext` class:
+There are two extension methods in the `OnModelCreating` method in the `DbContext` class:
 
 - **ConfigureEnumLookup(...)** allows you to define in which form lookup tables for *Enums* will be constructed and named:
 
@@ -46,6 +50,7 @@ The two extension methods in the `OnModelCreating` method in the `DbContext` cla
   - **SetNamingScheme(...)** allows you to override the naming using one of the predefined schemes (see below) or a custom function.
   - **UseEnumsWithAttributeOnly()** to generate the enum lookup tables only for enums marked with the `[EnumLookup]` attribute
   - **SetDeleteBehavior(...)** to configure the delete behavior for the generated FKs, using the `Microsoft.EntityFrameworkCore.DeleteBehavior` enum (defaults to _Cascade_)
+  - **Please note:** For owned entities, you should call the **ConfigureOwnedEnumLookup(...)** method on the `OwnedNavigationBuilder`. Please see [#16](/../../issues/16) for more details. E.g. `modelBuilder.Entity<Customer>().OwnsOne(x => x.Address, ownedBuilder => ownedBuilder.ConfigureOwnedEnumLookup(...));`
 
 - **ConfigureNames(...)** allows you to define in which form tables, properties and constraints will be named:
 
