@@ -18,7 +18,7 @@
 		<RepositoryUrl>https://github.com/SpatialFocus/SpatialFocus.EntityFrameworkCore.Extensions.git</RepositoryUrl>
 		<Authors>Dresel,pergerch</Authors>
 		<Company>SpatialFocus</Company>
-		<PackageOutputPath>..\..\.nuget\</PackageOutputPath>
+		<PackageOutputPath>..\..\.nuget</PackageOutputPath>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 
 		<IncludeSymbols>true</IncludeSymbols>
