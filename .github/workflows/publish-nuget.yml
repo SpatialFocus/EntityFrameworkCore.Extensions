@@ -1,0 +1,38 @@
+name: Build and publish NuGet
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  publish:
+    name: build, pack & publish
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Publish NuGet
+      id: publishNuGet
+      uses: brandedoutcast/publish-nuget@v2.5.5
+      with:
+        # Filepath of the project to be packaged, relative to root of repository
+        PROJECT_FILE_PATH: src/SpatialFocus.EntityFrameworkCore.Extensions/SpatialFocus.EntityFrameworkCore.Extensions.csproj
+        # NuGet package id, used for version detection & defaults to project name
+        PACKAGE_NAME: SpatialFocus.EntityFrameworkCore.Extensions
+        # API key to authenticate with NuGet server
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
+        INCLUDE_SYMBOLS: true
+    - name: Persist NuGet artifact
+      uses: actions/upload-artifact@v1
+      if: ${{steps.publishNuGet.outputs.PACKAGE_NAME != ''}}
+      with:
+        name: ${{steps.publishNuGet.outputs.PACKAGE_NAME}}
+        path: ${{steps.publishNuGet.outputs.PACKAGE_PATH}}
+    - name: Persist SNuGet artifact
+      uses: actions/upload-artifact@v1
+      if: ${{steps.publishNuGet.outputs.SYMBOLS_PACKAGE_NAME != ''}}
+      with:
+        name: ${{steps.publishNuGet.outputs.SYMBOLS_PACKAGE_NAME}}
+        path: ${{steps.publishNuGet.outputs.SYMBOLS_PACKAGE_PATH}}
