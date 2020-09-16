@@ -12,7 +12,7 @@
 		<PackageTags>EntityFrameworkCore,EFCore,enum lookup,naming helpers</PackageTags>
 		<PackageProjectUrl>https://github.com/SpatialFocus/SpatialFocus.EntityFrameworkCore.Extensions</PackageProjectUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageIcon>icon.png</PackageIcon>
+		<PackageIcon>nuget-icon.png</PackageIcon>
 		<PackageIconUrl>https://raw.githubusercontent.com/SpatialFocus/SpatialFocus.EntityFrameworkCore.Extensions/master/docs/nuget-icon.png</PackageIconUrl>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/SpatialFocus/SpatialFocus.EntityFrameworkCore.Extensions.git</RepositoryUrl>
@@ -37,7 +37,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\docs\icon.png" Pack="true" PackagePath="\" />
+		<None Include="..\..\docs\nuget-icon.png" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 </Project>
