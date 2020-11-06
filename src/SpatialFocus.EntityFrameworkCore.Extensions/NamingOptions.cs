@@ -119,9 +119,11 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 		public NamingOptions SkipTableNamingForGenericEntityTypes()
 		{
-			return SkipTableNamingForEntities(entity =>
-				entity.ClrType.IsGenericType && (entity.ClrType.GetGenericTypeDefinition() == typeof(EnumWithNumberLookup<>) ||
-					entity.ClrType.GetGenericTypeDefinition() == typeof(EnumWithStringLookup<>)));
+			return SkipTableNamingForEntities(entity => entity.ClrType.IsGenericType &&
+				(entity.ClrType.GetGenericTypeDefinition() == typeof(EnumWithNumberLookup<>) ||
+					entity.ClrType.GetGenericTypeDefinition() == typeof(EnumWithNumberLookupAndDescription<>) ||
+					entity.ClrType.GetGenericTypeDefinition() == typeof(EnumWithStringLookup<>) ||
+					entity.ClrType.GetGenericTypeDefinition() == typeof(EnumWithNumberLookupAndDescription<>)));
 		}
 	}
 }
