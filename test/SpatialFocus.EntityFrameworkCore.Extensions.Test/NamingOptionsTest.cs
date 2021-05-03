@@ -8,6 +8,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.Test
 	using System;
 	using System.Linq;
 	using Microsoft.EntityFrameworkCore;
+	using Microsoft.EntityFrameworkCore.ChangeTracking;
 	using Microsoft.EntityFrameworkCore.Metadata;
 	using Microsoft.EntityFrameworkCore.Storage;
 	using SpatialFocus.EntityFrameworkCore.Extensions.Test.Entities;
@@ -87,6 +88,33 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.Test
 			Assert.True(findEntityType.GetKeys().All(x => x.GetName() == NamingScheme.SnakeCase(x.GetDefaultName())));
 			Assert.True(findEntityType.GetForeignKeys().All(x => x.GetConstraintName() == NamingScheme.SnakeCase(x.GetDefaultName())));
 			Assert.True(findEntityType.GetIndexes().All(x => x.GetName() == NamingScheme.SnakeCase(x.GetDefaultName())));
+		}
+
+		[Fact]
+		public void MultipleProviders()
+		{
+			DbContextOptions<ChangeTrackerInConstructorContext> inMemoryOptions = new DbContextOptionsBuilder<ChangeTrackerInConstructorContext>()
+				.UseInMemoryDatabase(Guid.NewGuid().ToString(), new InMemoryDatabaseRoot())
+				.Options;
+
+			ChangeTrackerInConstructorContext _ = new ChangeTrackerInConstructorContext(inMemoryOptions, EnumLookupOptions.Default, null);
+
+			DbContextOptions<ChangeTrackerInConstructorContext> sqliteOptions = new DbContextOptionsBuilder<ChangeTrackerInConstructorContext>()
+				.UseSqlite("Filename=:memory:")
+				.Options;
+
+			ChangeTrackerInConstructorContext context = new ChangeTrackerInConstructorContext(sqliteOptions, EnumLookupOptions.Default, null);
+			context.Database.EnsureCreated();
+			context.Dispose();
+		}
+
+		private class ChangeTrackerInConstructorContext : ProductContext
+		{
+			public ChangeTrackerInConstructorContext(DbContextOptions options, EnumLookupOptions enumLookupOptions, NamingOptions namingOptions)
+				: base(options, enumLookupOptions, namingOptions)
+			{
+				ChangeTracker _ = ChangeTracker;
+			}
 		}
 	}
 }
