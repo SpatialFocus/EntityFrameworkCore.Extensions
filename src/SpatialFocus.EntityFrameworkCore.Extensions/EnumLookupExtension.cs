@@ -17,8 +17,6 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 
 	public static class EnumLookupExtension
 	{
-		private static List<Type> ConcreteTypeSeededList { get; set; } = new List<Type>();
-
 		public static void ConfigureEnumLookup(this ModelBuilder modelBuilder, EnumLookupOptions enumOptions)
 		{
 			foreach (IMutableProperty property in modelBuilder.Model.GetEntityTypes().SelectMany(x => x.GetProperties()).ToList())
@@ -88,6 +86,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 			bool usesDescription = enumValueDescriptions.Values.Any(x => x != null);
 
 			Type enumLookupEntityType = GetEnumLookupEntityType(enumOptions, usesDescription, enumType);
+			bool shouldSkipEnumLookupTableConfiguration = modelBuilder.Model.FindEntityType(enumLookupEntityType) != null;
 
 			configureEntityType(enumLookupEntityType);
 
@@ -98,12 +97,10 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 				configureEntityTypeConversion(valueConverter);
 			}
 
-			if (ConcreteTypeSeededList.Contains(enumLookupEntityType))
+			if (shouldSkipEnumLookupTableConfiguration)
 			{
 				return;
 			}
-
-			ConcreteTypeSeededList.Add(enumLookupEntityType);
 
 			EntityTypeBuilder enumLookupBuilder = modelBuilder.Entity(enumLookupEntityType);
 			ConfigureEnumLookupTable(enumLookupBuilder, enumOptions, enumType);
