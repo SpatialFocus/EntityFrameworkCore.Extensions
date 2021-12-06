@@ -34,7 +34,11 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.Test
 			ProductContext context = GetContext(namingOptions: new NamingOptions().OverrideColumnNaming(NamingScheme.SnakeCase));
 
 			IEntityType findEntityType = context.Model.FindEntityType(typeof(ProductTag));
+#if NET5_0_OR_GREATER
+			Assert.Equal("product_tag_id", findEntityType.FindProperty(nameof(ProductTag.ProductTagId)).GetColumnBaseName());
+#else
 			Assert.Equal("product_tag_id", findEntityType.FindProperty(nameof(ProductTag.ProductTagId)).GetColumnName());
+#endif
 		}
 
 		[Fact]
@@ -44,10 +48,21 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.Test
 
 			IEntityType findEntityType = context.Model.FindEntityType(typeof(ProductTag));
 			Assert.Equal("ProductTag", findEntityType.GetTableName());
+
+#if NET5_0_OR_GREATER
+			Assert.Equal("ProductTagId", findEntityType.FindProperty(nameof(ProductTag.ProductTagId)).GetColumnBaseName());
+#else
 			Assert.Equal("ProductTagId", findEntityType.FindProperty(nameof(ProductTag.ProductTagId)).GetColumnName());
+#endif
+
 			Assert.True(findEntityType.GetKeys().All(x => x.GetName() == NamingScheme.SnakeCase(x.GetDefaultName())));
 			Assert.True(findEntityType.GetForeignKeys().All(x => x.GetConstraintName() == NamingScheme.SnakeCase(x.GetDefaultName())));
+
+#if NET5_0_OR_GREATER
+			Assert.True(findEntityType.GetIndexes().All(x => x.GetDatabaseName() == NamingScheme.SnakeCase(x.GetDefaultDatabaseName())));
+#else
 			Assert.True(findEntityType.GetIndexes().All(x => x.GetName() == NamingScheme.SnakeCase(x.GetDefaultName())));
+#endif
 		}
 
 		[Fact]
@@ -77,6 +92,20 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.Test
 			Assert.Equal("product_tags", findEntityType.GetTableName());
 		}
 
+#if NET5_0_OR_GREATER
+		[Fact]
+		public void SetNamingScheme()
+		{
+			ProductContext context = GetContext(namingOptions: new NamingOptions().SetNamingScheme(NamingScheme.SnakeCase));
+
+			IEntityType findEntityType = context.Model.FindEntityType(typeof(ProductTag));
+			Assert.Equal("product_tag", findEntityType.GetTableName());
+			Assert.Equal("product_tag_id", findEntityType.FindProperty(nameof(ProductTag.ProductTagId)).GetColumnBaseName());
+			Assert.True(findEntityType.GetKeys().All(x => x.GetName() == NamingScheme.SnakeCase(x.GetDefaultName())));
+			Assert.True(findEntityType.GetForeignKeys().All(x => x.GetConstraintName() == NamingScheme.SnakeCase(x.GetDefaultName())));
+			Assert.True(findEntityType.GetIndexes().All(x => x.GetDatabaseName() == NamingScheme.SnakeCase(x.GetDefaultDatabaseName())));
+		}
+#else
 		[Fact]
 		public void SetNamingScheme()
 		{
@@ -89,6 +118,7 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions.Test
 			Assert.True(findEntityType.GetForeignKeys().All(x => x.GetConstraintName() == NamingScheme.SnakeCase(x.GetDefaultName())));
 			Assert.True(findEntityType.GetIndexes().All(x => x.GetName() == NamingScheme.SnakeCase(x.GetDefaultName())));
 		}
+#endif
 
 		[Fact]
 		public void MultipleProviders()

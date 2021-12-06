@@ -31,7 +31,11 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 				// Properties
 				entity.GetProperties()
 					.ToList()
+#if NET5_0_OR_GREATER
+					.ForEach(x => x.SetColumnName(namingOptions.ColumnNamingFunction(x.GetColumnBaseName())));
+#else
 					.ForEach(x => x.SetColumnName(namingOptions.ColumnNamingFunction(x.GetColumnName())));
+#endif
 
 				// Primary and Alternative keys
 				entity.GetKeys().ToList().ForEach(x => x.SetName(namingOptions.ConstraintNamingFunction(x.GetName())));
@@ -44,7 +48,11 @@ namespace SpatialFocus.EntityFrameworkCore.Extensions
 				// Indices
 				entity.GetIndexes()
 					.ToList()
+#if NET5_0_OR_GREATER
+					.ForEach(x => x.SetDatabaseName(namingOptions.ConstraintNamingFunction(x.GetDatabaseName())));
+#else
 					.ForEach(x => x.SetName(namingOptions.ConstraintNamingFunction(x.GetName())));
+#endif
 			}
 		}
 	}
