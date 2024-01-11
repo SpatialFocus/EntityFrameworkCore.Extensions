@@ -2,7 +2,7 @@ name: Build and publish NuGet
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, ci-update ]
   pull_request:
     branches: [ master ]
 
@@ -12,34 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-dotnet@v1.9.0
+    - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: |
           3.1.x
           5.0.x
           6.0.x
           8.0.x
-    - name: Publish NuGet
-      id: publishNuGet
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-        # Filepath of the project to be packaged, relative to root of repository
-        PROJECT_FILE_PATH: src/SpatialFocus.EntityFrameworkCore.Extensions/SpatialFocus.EntityFrameworkCore.Extensions.csproj
-        # NuGet package id, used for version detection & defaults to project name
-        PACKAGE_NAME: SpatialFocus.EntityFrameworkCore.Extensions
-        # API key to authenticate with NuGet server
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
-        INCLUDE_SYMBOLS: true
-    - name: Persist NuGet artifact
-      uses: actions/upload-artifact@v1
-      if: ${{steps.publishNuGet.outputs.PACKAGE_NAME != ''}}
-      with:
-        name: ${{steps.publishNuGet.outputs.PACKAGE_NAME}}
-        path: ${{steps.publishNuGet.outputs.PACKAGE_PATH}}
-    - name: Persist SNuGet artifact
-      uses: actions/upload-artifact@v1
-      if: ${{steps.publishNuGet.outputs.SYMBOLS_PACKAGE_NAME != ''}}
-      with:
-        name: ${{steps.publishNuGet.outputs.SYMBOLS_PACKAGE_NAME}}
-        path: ${{steps.publishNuGet.outputs.SYMBOLS_PACKAGE_PATH}}
+    - name: Build
+      run: dotnet build --configuration Release
+    - name: Pack
+      run: dotnet pack src/SpatialFocus.EntityFrameworkCore.Extensions.csproj --output . --configuration Release
+    - name: Push
+      run: dotnet nuget push *.nupkg --skip-duplicate --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
