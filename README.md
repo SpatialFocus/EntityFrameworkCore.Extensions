@@ -2,7 +2,7 @@
 
 A set of useful extensions for EntityFrameworkCore (Enum Lookup Tables, Naming of tables / properties / keys, Pluralize).
 
-[![Build Status](https://spatial-focus.visualstudio.com/EntityFrameworkCore.Extensions/_apis/build/status/EntityFrameworkCore.Extensions-CI)](https://spatial-focus.visualstudio.com/EntityFrameworkCore.Extensions/_build/latest?definitionId=3)
+[![Build / Publish NuGet](https://github.com/SpatialFocus/EntityFrameworkCore.Extensions/actions/workflows/publish-nuget.yml/badge.svg)](https://github.com/SpatialFocus/EntityFrameworkCore.Extensions/actions/workflows/publish-nuget.yml)
 [![NuGet](https://img.shields.io/nuget/v/SpatialFocus.EntityFrameworkCore.Extensions.svg)](https://www.nuget.org/packages/SpatialFocus.EntityFrameworkCore.Extensions/)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSpatialFocus%2FEntityFrameworkCore.Extensions.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FSpatialFocus%2FEntityFrameworkCore.Extensions?ref=badge_shield)
 
