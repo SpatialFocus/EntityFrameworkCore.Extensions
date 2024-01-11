@@ -22,6 +22,6 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release
     - name: Pack
-      run: dotnet pack src/SpatialFocus.EntityFrameworkCore.Extensions.csproj --output . --configuration Release
+      run: dotnet pack src/SpatialFocus.EntityFrameworkCore.Extensions/SpatialFocus.EntityFrameworkCore.Extensions.csproj --output . --configuration Release
     - name: Push
       run: dotnet nuget push *.nupkg --skip-duplicate --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
